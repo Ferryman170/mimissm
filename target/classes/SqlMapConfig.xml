@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--Mybatis配置文件,已经完全被spring框架接管,spring框架整合了Mybatis和springmvc-->
+<configuration>
+    <!--添加日志配置,STDOUT_LOGGING是标准日志。mybatis自带的-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <!--分页插件的配置,在执行sql语句之前做一个拦截器,拦截当前方法,追加limit分页条件,spring框架接管不了-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>
+</configuration>

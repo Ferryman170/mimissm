@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--<import resource="classpath:applicationContext_dao.xml"></import>-->
+    <!--设置业务逻辑层的包扫描器,目的是在指定的路径下,使用@Service注解的类,Spring负责创建对象,并添加依赖-->
+    <context:component-scan base-package="com.my.service"></context:component-scan>
+    <!--设置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--       Spring所有配置文件通过初始化参数注入到Spring容器中-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--添加事务的切面 transactionManager：事务管理器-->
+    <tx:advice id="myadvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--设置参与事务的方法。事务特性：只读，查询时，回避增删改的操作，独占数据-->
+            <tx:method name="*select*" read-only="true"/>
+            <tx:method name="*find*" read-only="true"/>
+            <tx:method name="*get*" read-only="true"/>
+            <tx:method name="*search*" read-only="true"/>
+            <!--增删改事务的传播特性，增删改，支持事务-->
+            <tx:method name="*insert*" propagation="REQUIRED"/>
+            <tx:method name="*save*" propagation="REQUIRED"/>
+            <tx:method name="*add*" propagation="REQUIRED"/>
+            <tx:method name="*delete*" propagation="REQUIRED"/>
+            <tx:method name="*remove*" propagation="REQUIRED"/>
+            <tx:method name="*clear*" propagation="REQUIRED"/>
+            <tx:method name="*update*" propagation="REQUIRED"/>
+            <tx:method name="*modify*" propagation="REQUIRED"/>
+            <tx:method name="*change*" propagation="REQUIRED"/>
+            <tx:method name="*set*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--完成切面和切入点的织入，把方法拦截，追加事务的处理-->
+    <aop:config>
+        <!--进行当前切入点的配置，指定切入点的表达式：哪个包下哪个类下哪个方法哪个参数应用事务管理（切入事务逻辑层）-->
+        <aop:pointcut id="mypointcut" expression="execution(* com.my.service.*.*(..))"/>
+         <!--绑定切面-->
+        <aop:advisor advice-ref="myadvice" pointcut-ref="mypointcut"></aop:advisor>
+    </aop:config>
+</beans>
